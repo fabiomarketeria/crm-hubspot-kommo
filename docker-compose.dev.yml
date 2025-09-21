@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Backend API (Development)
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: sqlite:///crm_database.db
+      SECRET_KEY: dev-secret-key
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+    volumes:
+      - ./backend:/app
+    networks:
+      - crm-network
+
+  # Frontend (Development)
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - crm-network
+
+networks:
+  crm-network:
+    driver: bridge
